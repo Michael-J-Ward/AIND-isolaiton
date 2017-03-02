@@ -38,7 +38,7 @@ def custom_score(game, player):
     """
 
     # TODO: finish this function!
-    raise NotImplementedError
+    return len(game.get_legal_moves(player))
 
 
 class CustomPlayer:
@@ -123,20 +123,23 @@ class CustomPlayer:
         # Perform any required initializations, including selecting an initial
         # move from the game board (i.e., an opening book), or returning
         # immediately if there are no legal moves
+        if not legal_moves:
+            return (-1, -1)
 
         try:
             # The search method call (alpha beta or minimax) should happen in
             # here in order to avoid timeout. The try/except block will
             # automatically catch the exception raised by the search method
             # when the timer gets close to expiring
-            pass
+            f = self.minimax if self.method == 'minimax' else self.alphabeta
+            _, move = f(game, self.search_depth)
 
         except Timeout:
             # Handle any actions required at timeout, if necessary
-            pass
+            move = legal_moves[0]
 
         # Return the best move from the last completed search iteration
-        raise NotImplementedError
+        return move
 
     def minimax(self, game, depth, maximizing_player=True):
         """Implement the minimax search algorithm as described in the lectures.
@@ -171,9 +174,13 @@ class CustomPlayer:
         """
         if self.time_left() < self.TIMER_THRESHOLD:
             raise Timeout()
+        # make sure to check the null state
 
-        # TODO: finish this function!
-        raise NotImplementedError
+        # f = max if maximizing_player else min
+        legal_moves = game.get_legal_moves()
+        options = ((self.score(game.forecast_move(m), self), m)
+                   for m in legal_moves)
+        return max(options)
 
     def alphabeta(self, game, depth, alpha=float("-inf"), beta=float("inf"), maximizing_player=True):
         """Implement minimax search with alpha-beta pruning as described in the
