@@ -38,7 +38,7 @@ def custom_score(game, player):
     """
 
     # TODO: finish this function!
-    return len(game.get_legal_moves(player))
+    return float(len(game.get_legal_moves(player)))
 
 
 class CustomPlayer:
@@ -125,18 +125,25 @@ class CustomPlayer:
         # immediately if there are no legal moves
         if not legal_moves:
             return (-1, -1)
-
+        # set a random default
+        move = legal_moves[0]
         try:
             # The search method call (alpha beta or minimax) should happen in
             # here in order to avoid timeout. The try/except block will
             # automatically catch the exception raised by the search method
             # when the timer gets close to expiring
             f = self.minimax if self.method == 'minimax' else self.alphabeta
-            _, move = f(game, self.search_depth)
+            if self.iterative:
+                depth = 1
+                while True:
+                    _, move = f(game, depth)
+                    depth += 1
+            else:
+                _, move = f(game, self.search_depth)
 
         except Timeout:
             # Handle any actions required at timeout, if necessary
-            move = legal_moves[0]
+            pass
 
         # Return the best move from the last completed search iteration
         return move
